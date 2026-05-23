@@ -40,6 +40,8 @@ function YoutubePlayer() {
   const [isKicked, setIsKicked] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   // Keep a ref of the role object to avoid closures capturing stale state in socket callbacks
   const roleRef = useRef(initialRoom);
@@ -99,7 +101,7 @@ function YoutubePlayer() {
           mute: 0,
           rel: 0,
           playsinline: 1,
-          controls: 1,
+          controls: 0,
           fs: 1,
           disablekb: 0,
           enablejsapi: 1,
@@ -314,6 +316,19 @@ function YoutubePlayer() {
     };
   }, [roomId]);
 
+  useEffect(() => {
+    const progressInterval = setInterval(() => {
+      if (playerRef.current && typeof playerRef.current.getCurrentTime === "function") {
+        setCurrentTime(playerRef.current.getCurrentTime() || 0);
+        const dur = playerRef.current.getDuration();
+        if (dur) {
+          setDuration(dur);
+        }
+      }
+    }, 500);
+    return () => clearInterval(progressInterval);
+  }, []);
+
   // Admin controls
   function handlePlay() {
     if (playerRef.current && isAllowedToControl(role.role)) {
@@ -444,7 +459,11 @@ function YoutubePlayer() {
       <div className="room-layout">
         {/* Left Side: Video Section */}
         <div className="video-section">
-          <PlayerScreen isPlayerReady={isPlayerReady} currentVideoId={vidid} />
+          <PlayerScreen 
+            isPlayerReady={isPlayerReady} 
+            currentVideoId={vidid} 
+            isAllowedToControl={isAllowedToControl(role.role)} 
+          />
 
           <AdminControls
             role={role.role}
@@ -455,6 +474,8 @@ function YoutubePlayer() {
             handleSkipAhead={handleSkipAhead}
             handleSkipTo={handleSkipTo}
             handleChangeVideo={handleChangeVideo}
+            currentTime={currentTime}
+            duration={duration}
           />
         </div>
 

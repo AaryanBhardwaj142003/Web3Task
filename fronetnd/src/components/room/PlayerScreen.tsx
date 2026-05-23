@@ -1,12 +1,16 @@
 interface PlayerScreenProps {
   isPlayerReady: boolean;
   currentVideoId: string;
+  isAllowedToControl: boolean;
 }
 
-export default function PlayerScreen({ isPlayerReady, currentVideoId }: PlayerScreenProps) {
+export default function PlayerScreen({ isPlayerReady, currentVideoId, isAllowedToControl }: PlayerScreenProps) {
   return (
     <div className="video-card">
-      <div className="video-player-wrapper">
+      <div 
+        className="video-player-wrapper"
+        style={{ pointerEvents: isAllowedToControl ? "auto" : "none" }}
+      >
         <div id="player"></div>
         {!isPlayerReady && (
           <div className="player-loading">
