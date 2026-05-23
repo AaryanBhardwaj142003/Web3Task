@@ -388,7 +388,7 @@ function YoutubePlayer() {
   }
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}/room/${roomId}`;
+    const url = `${roomId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
